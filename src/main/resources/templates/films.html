@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Cards</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #141e30, #243b55);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #movieCards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 10px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background: #fff; /* Set a background color for the card */
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card img {
+            max-width: 100%;
+            height: auto;
+            border-bottom: 1px solid #ddd; /* Add a subtle border at the bottom of the image */
+        }
+
+        .card-content {
+            padding: 10px;
+            text-align: center;
+            color: black; /* Set text color to black */
+        }
+
+    </style>
+</head>
+<body>
+<div id="movieCards"></div>
+
+<script>
+    // Function to fetch data from the API
+    async function fetchData() {
+        const response = await fetch('http://localhost:8080/films');
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log('Data received from API:', data); // Add this line
+        createMovieCards(data);
+    }
+
+    function createMovieCards(data) {
+        const container = document.getElementById('movieCards');
+
+        const films = data._embedded.films;
+
+        films.forEach(movie => {
+            const card = document.createElement('div');
+            card.className = 'card';
+
+            const image = document.createElement('img');
+            // Construct the correct URL for the movie's image
+            image.src = `/imageFilm/${movie.id}`;
+            image.alt = movie.title;
+
+            const cardContent = document.createElement('div');
+            cardContent.className = 'card-content';
+
+            const title = document.createElement('h2');
+            title.textContent = movie.title;
+
+            const description = document.createElement('p');
+            description.textContent = movie.description || 'No description available';
+
+            cardContent.appendChild(title);
+            cardContent.appendChild(description);
+
+            card.appendChild(image);
+            card.appendChild(cardContent);
+
+            container.appendChild(card);
+        });
+    }
+
+    // Call the function to fetch data
+    fetchData();
+</script>
+</body>
+</html>
